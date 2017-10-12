@@ -12,18 +12,33 @@ but WITHOUT ANY WARRANTY.
 #include <iostream>
 #include "Dependencies\glew.h"
 #include "Dependencies\freeglut.h"
+#include "Object.h"
+#include "Unit.h"
 
-#include "Renderer.h"
-
-Renderer *g_Renderer = NULL;
+//Renderer *g_Renderer = NULL;
+Object* objects[10];
+Unit* unit[10];
+int current=0,u_current=0;
 
 void RenderScene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 
+	
+	for (int i = 0;i < current;++i)
+	{
+		objects[i] -> Render();
+		
+	}
+	for (int i = 0;i < u_current;++i) 
+	{
+		unit[i]->u_Render();
+		unit[i]->u_Update();
+	}
 	// Renderer Test
-	g_Renderer->DrawSolidRect(0, 0, 0, 4, 1, 0, 1, 1);
+	//g_Renderer->DrawSolidRect(0, 0, 0, 10, 1, 1, 1, 1);	
+	//x,y,z,ÇÈ¼¿Å©±â,RGB
 
 	glutSwapBuffers();
 }
@@ -35,6 +50,18 @@ void Idle(void)
 
 void MouseInput(int button, int state, int x, int y)
 {
+	bool g_Leftbuttondown = true;
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+		g_Leftbuttondown = true;
+	}
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+		if (g_Leftbuttondown) {
+			Unit* newunit = new Unit({ 50,-20,0 }, { 255,0,0,1 }, 10, 0.2, 0.2);
+			unit[u_current] = newunit;
+			u_current++;
+		}
+		g_Leftbuttondown = false;
+	}
 	RenderScene();
 }
 
@@ -68,11 +95,33 @@ int main(int argc, char **argv)
 	}
 
 	// Initialize Renderer
-	g_Renderer = new Renderer(500, 500);
-	if (!g_Renderer->IsInitialized())
-	{
-		std::cout << "Renderer could not be initialized.. \n";
-	}
+	//g_Renderer = new Renderer(500, 500);
+	//if (!g_Renderer->IsInitialized())
+	//{
+	//	std::cout << "Renderer could not be initialized.. \n";
+	//}
+
+
+	Object* newobject = new Object({ -250,-200,0 }, { 0.0,3.0,2.0,1 }, 50,150);
+	objects[current] = newobject;
+	current++;
+
+	newobject = new Object({ 250,-200,0 }, { 0.0,3.0,2.0,1 }, 50,150);
+	objects[current] = newobject;
+	current++;
+
+	newobject = new Object({ 250,200,0 }, { 0,255,0,1 }, 50,150);
+	objects[current] = newobject;
+	current++;
+
+	newobject = new Object({ -250,200,0 }, { 0,255,0,1 }, 50,150);
+	objects[current] = newobject;
+	current++;
+	
+	Unit* newunit = new Unit({ 50,-20,0 }, {255,0,0,1 }, 10,0.2,0.2);
+	unit[u_current] = newunit;
+	u_current++;
+	
 
 	glutDisplayFunc(RenderScene);
 	glutIdleFunc(Idle);
@@ -82,7 +131,7 @@ int main(int argc, char **argv)
 
 	glutMainLoop();
 
-	delete g_Renderer;
+	//delete g_Renderer;
 
     return 0;
 }
