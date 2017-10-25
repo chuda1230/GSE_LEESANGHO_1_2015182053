@@ -1,31 +1,23 @@
 #pragma once
-#include "Renderer.h"
-
-struct Transform
-{
-	float x;
-	float y;
-	float z;
-};
-struct Color
-{
-	float r;
-	float g;
-	float b;
-	float a;
-};
+//#include "Renderer.h"
 class Object
 {
 public:
-	Object(Transform pos, Color color,int size,int hp);
-	void Render();
-	void Update();
+	Object(const Transform& pos, const Color& color, const float size, Renderer* renderer);
+	void SetTransform(const Transform& pos, const float size);
+	void GetTransform(Transform & pos);
+	void SetColor(const Color& color);
+	void GetColor(Color& color);
+	float GetSize() { return m_size; }
+	virtual void Render();
+	virtual void Update(float speed, Transform & direction);
 	~Object();
+
 private:
 	Transform m_transform;
-	Renderer* building_Renderer;
+	Renderer* m_renderer;
 	Color m_color;
-	int m_size;
-	int b_hp;
+	float m_size;
+	Transform m_direction;
 };
 

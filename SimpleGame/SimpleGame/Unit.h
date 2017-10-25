@@ -16,7 +16,7 @@ struct u_Color
 class Unit
 {
 public:
-	Unit(u_Transform pos,u_Color color,int size,float mx,float my);
+	Unit(u_Transform pos,u_Color color,int size,float mx,float my,int hp);
 	void u_Render();
 	void u_Update();
 	void u_Disappear();
@@ -28,5 +28,6 @@ private:
 	int u_size;
 	float m_x;
 	float m_y;
+	int u_hp;
 };
 
