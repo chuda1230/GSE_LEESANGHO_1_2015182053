@@ -21,29 +21,15 @@ SceneMgr::SceneMgr(Renderer* renderer)
 SceneMgr::~SceneMgr()
 {
 }
+int o_num = 0;
 void SceneMgr::AddObject()
 {
+	if(o_num<=10){
 	srand((unsigned)time(NULL));
 	for (int i = 0; i < 50; ++i)
 	{
 		float x = (rand() % 500) - 200;
-		float y = 200-(rand() % 500);
-		//float size = float(rand() % 10 + 1);
-		float size = 10;
-		//cout << x << " " << y;
-		Transform newPos = { x,y};
-		Object* newObject = new Object(newPos, {1,1,1 }, size, m_renderer);
-		Transform speed = { rand() / (float)RAND_MAX * 100,rand() / (float)RAND_MAX * 100,0 };
-		newObject->SetSpeed(speed);
-		m_objectList.push_back(newObject);
-	}
-}
-
-void SceneMgr::AddObject(float x,float y)
-{
-		srand((unsigned)time(NULL));
-		x=x-250;
-		y=250-y;
+		float y = 200 - (rand() % 500);
 		//float size = float(rand() % 10 + 1);
 		float size = 10;
 		//cout << x << " " << y;
@@ -52,6 +38,27 @@ void SceneMgr::AddObject(float x,float y)
 		Transform speed = { rand() / (float)RAND_MAX * 100,rand() / (float)RAND_MAX * 100,0 };
 		newObject->SetSpeed(speed);
 		m_objectList.push_back(newObject);
+		o_num++;
+	}
+	}
+}
+
+void SceneMgr::AddObject(float x,float y)
+{
+	if (o_num <= 10) {
+		srand((unsigned)time(NULL));
+		x = x - 250;
+		y = 250 - y;
+		//float size = float(rand() % 10 + 1);
+		float size = 10;
+		//cout << x << " " << y;
+		Transform newPos = { x,y };
+		Object* newObject = new Object(newPos, { 1,1,1 }, size, m_renderer);
+		Transform speed = { rand() / (float)RAND_MAX * 100,rand() / (float)RAND_MAX * 100,0 };
+		newObject->SetSpeed(speed);
+		m_objectList.push_back(newObject);
+		o_num++;
+	}
 }
 
 Object * SceneMgr::GetObject(int index)
@@ -94,8 +101,10 @@ void SceneMgr::Update()
 			}
 		}
 		data->Update(elapsedTime);
-		if (data->IsDead())
+		if (data->IsDead()) {
 			m_objectList.erase(m_objectList.begin() + i);
+			o_num--;
+		}
 	}
 }
 
