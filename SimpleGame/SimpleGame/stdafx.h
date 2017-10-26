@@ -9,6 +9,7 @@
 #include "Renderer.h"
 #include<random>
 #include<ctime>
+#include<Windows.h>
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
@@ -19,12 +20,21 @@ struct Transform
 	float x;
 	float y;
 	float z;
-	Transform operator-(Transform& param)
+	Transform operator-(float param)
 	{
 		Transform result;
-		result.x = x - param.x;
-		result.y = y - param.y;
-		result.z = z - param.z;
+		result.x = x - param;
+		result.y = y - param;
+		result.z = z - param;
+		return result;
+	}
+	bool operator==(Transform& param)
+	{
+		if (x == param.x&&y == param.y&&z == param.z)
+		{
+			return true;
+		}
+		return false;
 	}
 };
 struct Color

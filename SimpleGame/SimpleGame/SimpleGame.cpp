@@ -16,8 +16,8 @@ but WITHOUT ANY WARRANTY.
 #include "SceneMgr.h"
 
 Renderer *g_Renderer = NULL;
-SceneMgr* g_sceneManager;
-int current=0,u_current=0;
+SceneMgr* g_sceneMgr=NULL;
+
 
 
 void init() {
@@ -28,8 +28,8 @@ void init() {
 		{
 			std::cout << "Renderer could not be initialized.. \n";
 		}
-		g_sceneManager = new SceneMgr(g_Renderer);
-		g_sceneManager->AddObject();
+		g_sceneMgr = new SceneMgr(g_Renderer);
+		//g_sceneManager->AddObject();
 
 }
 
@@ -42,21 +42,20 @@ void RenderScene(void)
 	// Renderer Test
 	//g_Renderer->DrawSolidRect(0, 0, 0, 10, 1, 1, 1, 1);	
 	//x,y,z,ÇÈ¼¿Å©±â,RGB
-	g_sceneManager->Render();
+	g_sceneMgr->Render();
 	glutSwapBuffers();
 }
 
 void Idle(void)
 {
-	g_sceneManager->Update();
+	g_sceneMgr->Update();
 	RenderScene();
 }
 void MouseInput(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
-		y = WINDOW_HEIGHT - y;
-		//cout << y << " " << x;
+		g_sceneMgr->AddObject(x, y);
 	}
 	RenderScene();
 }
@@ -107,7 +106,7 @@ int main(int argc, char **argv)
 
 	glutMainLoop();
 
-	//delete g_Renderer;
+	delete g_Renderer;
 
     return 0;
 }
