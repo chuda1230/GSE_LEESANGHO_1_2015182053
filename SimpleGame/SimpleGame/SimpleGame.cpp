@@ -15,20 +15,21 @@ but WITHOUT ANY WARRANTY.
 //#include "Object.h"
 #include "SceneMgr.h"
 
-Renderer *g_Renderer = NULL;
+//Renderer *g_Renderer = NULL;
 SceneMgr* g_sceneMgr=NULL;
 
 
 
 void init() {
+	srand((unsigned)time(NULL));
+	g_sceneMgr = new SceneMgr();
 	
-	
-		g_Renderer = new Renderer(WINDOW_WIDTH, WINDOW_HEIGHT);
+		/*g_Renderer = new Renderer(WINDOW_WIDTH, WINDOW_HEIGHT);
 		if (!g_Renderer->IsInitialized())
 		{
 			std::cout << "Renderer could not be initialized.. \n";
 		}
-		g_sceneMgr = new SceneMgr(g_Renderer);
+		g_sceneMgr = new SceneMgr(g_Renderer);*/
 		//g_sceneManager->AddObject();
 
 }
@@ -37,8 +38,6 @@ void RenderScene(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
-
-	
 	// Renderer Test
 	//g_Renderer->DrawSolidRect(0, 0, 0, 10, 1, 1, 1, 1);	
 	//x,y,z,ÇÈ¼¿Å©±â,RGB
@@ -55,7 +54,7 @@ void MouseInput(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
-		g_sceneMgr->AddObject(x, y);
+		g_sceneMgr->AddObject(x, y, { 1,1,1,1 },10,OBJECT_CHARACTER,10, { 100 ,100 ,0 });
 	}
 	RenderScene();
 }
@@ -106,7 +105,7 @@ int main(int argc, char **argv)
 
 	glutMainLoop();
 
-	delete g_Renderer;
+	//delete g_Renderer;
 
     return 0;
 }

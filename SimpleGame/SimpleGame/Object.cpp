@@ -2,14 +2,15 @@
 #include "Object.h"
 
 
-Object::Object(const Transform& pos, const Color& color, const float size, Renderer* renderer)
+Object::Object(const Transform& pos, const Color& color, const float size, Renderer* renderer,int type,int life)
 {
 	//srand((unsigned)time(NULL));
 	m_transform = pos;
 	m_color = color;
 	m_size = size;
 	m_renderer = renderer;
-
+	m_type = type;
+	m_life = life;
 	m_direction = { float(rand() % 3) + 1,float(rand() % 3) + 1,0 };
 	if (rand() % 2 == 1)
 	{
@@ -19,7 +20,6 @@ Object::Object(const Transform& pos, const Color& color, const float size, Rende
 	{
 		m_direction.y *= -1;
 	}
-	m_life = 10;//rand() % 10 + 1;
 }
 
 
@@ -43,10 +43,17 @@ void Object::SetSpeed(const Transform speed)
 {
 	m_speed = speed;
 }
-
-void Object::Damage(const float amount)
+int Object::GetType()
 {
-	m_lifeTime += amount;
+	return m_type;
+}
+void Object::ShowLife()
+{
+	cout << m_life;
+}
+void Object::Damage(const float damage)
+{
+	m_life -= damage;
 }
 
 Color Object::GetColor(Color & color)
@@ -57,6 +64,12 @@ Color Object::GetColor(Color & color)
 
 Transform* Object::GetCollider()
 {
+	m_collider[0].x = m_transform.x - (m_size / 2);
+	m_collider[0].y = m_transform.y - (m_size / 2);
+	m_collider[0].z = 0;
+	m_collider[1].x = m_transform.x + (m_size / 2);
+	m_collider[1].y = m_transform.y + (m_size / 2);
+	m_collider[1].z = 0;
 	return m_collider;
 }
 
@@ -67,22 +80,11 @@ void Object::Render()
 }
 void Object::Update(float elapsedTime)
 {
-	m_lifeTime += elapsedTime;
-	if (m_life < m_lifeTime)
-	{
-		m_dead = true;
-	}
-
 	m_transform.y += m_direction.y*m_speed.x*elapsedTime;
 	m_transform.x += m_direction.x*m_speed.y*elapsedTime;
 	m_transform.z += m_direction.z*m_speed.z*elapsedTime;
 
-	m_collider[0].x = m_transform.x - (m_size / 2);
-	m_collider[0].y = m_transform.y - (m_size / 2);
-	m_collider[0].z = 0;
-	m_collider[1].x = m_transform.x + (m_size / 2);
-	m_collider[1].y = m_transform.y + (m_size / 2);
-	m_collider[1].z = 0;
+
 
 	if (m_transform.y >= 300)
 	{
@@ -101,6 +103,7 @@ void Object::Update(float elapsedTime)
 		m_direction.y = 1;
 	}
 }
+
 
 
 
