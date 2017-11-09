@@ -20,7 +20,7 @@ SceneMgr::SceneMgr()
 
 	m_size = 100;	//50°³ÀÇ °´Ã¼
 	m_prevTime = (float)timeGetTime()*0.001f;
-	Object* newObject = new Object({ 0,0,0 }, { 255,255,255,0 }, 50, m_renderer, OBJECT_BUILDING, 50);
+	Object* newObject = new Object({ 0,0,0 }, { 1,1,0,0 }, 50, m_renderer, OBJECT_BUILDING, 500);
 	//m_objectList.push_back(newObject);
 	m_buildingList.push_back(newObject);
 }
@@ -107,7 +107,7 @@ void SceneMgr::Update()
 				building->Damage(5);
 				building->ShowLife();
 				nowobj->Damage(10);
-				building->SetColor({ 1,0,0,1 });
+				//building->SetColor({ 1,0,0,1 });
 			}
 			if (building->IsDead())
 			{
