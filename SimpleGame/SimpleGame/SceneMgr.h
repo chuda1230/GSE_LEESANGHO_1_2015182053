@@ -1,9 +1,10 @@
 #pragma once
-#include"Object.h"
 #define OBJECT_BUILDING 0
 #define OBJECT_CHARACTER 1
 #define OBJECT_BULLET 2
-#define OBJECT_ARROW 3
+#include"Object.h"
+
+
 class SceneMgr
 {
 public:
@@ -16,9 +17,12 @@ public:
 	void Update();
 	void Render();
 private:
+	GLuint m_texture;
+
 	vector<Object*> m_objectList;
 	vector<Object*> m_bulletList;
 	vector<Object*> m_buildingList;
+	
 	Renderer* m_renderer;
 	int m_size;
 

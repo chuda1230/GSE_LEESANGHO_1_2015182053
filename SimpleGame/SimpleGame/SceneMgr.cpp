@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SceneMgr.h"
 bool BoxCollision(Transform* standard, Transform* target)
 {
@@ -18,11 +18,14 @@ SceneMgr::SceneMgr()
 		std::cout << "Renderer could not be initialized.. \n";
 	}
 
-	m_size = 100;	//50°³ÀÇ °´Ã¼
+	m_size = 100;	
 	m_prevTime = (float)timeGetTime()*0.001f;
 	Object* newObject = new Object({ 0,0,0 }, { 1,1,0,0 }, 50, m_renderer, OBJECT_BUILDING, 500);
+	printf("a");
 	//m_objectList.push_back(newObject);
 	m_buildingList.push_back(newObject);
+
+	m_texture = m_renderer->CreatePngTexture("./Resources/station.png");
 }
 SceneMgr::~SceneMgr()
 {
@@ -49,7 +52,7 @@ SceneMgr::~SceneMgr()
 //	}
 //}
 
-void SceneMgr::AddObject(float x,float y,Color color,int size,int type,int life, Transform speed)
+void SceneMgr::AddObject(float x, float y, Color color, int size, int type, int life, Transform speed)
 {
 	if (m_objectList.size() <= 100) {
 		x = x - 250;
@@ -81,8 +84,9 @@ void SceneMgr::Update()
 	m_fireTime += elapsedTime;
 	//srand(time(NULL));
 	if (m_fireTime > 0.5 && m_buildingList.size() > 0) {
+		printf("s");
 		m_fireTime = 0;
-		Object* newObject = new Object({ 0,0,0 }, { 1,1,1 },2, m_renderer, OBJECT_BULLET, 20);
+		Object* newObject = new Object({ 0,0,0 }, { 1,1,1 }, 2, m_renderer, OBJECT_BULLET, 20);
 		newObject->SetSpeed({ 300,300,0 });
 		m_bulletList.push_back(newObject);
 	}
@@ -90,12 +94,13 @@ void SceneMgr::Update()
 	Transform* s_collider = nullptr;
 	Transform* o_collider = nullptr;
 	Transform* b_collider = nullptr;
-	
+	Transform* a_collider = nullptr;
 
 	for (int j = 0;j < m_objectList.size();++j)
 	{
 		Object* nowobj = m_objectList[j];
 		o_collider = nowobj->GetCollider();
+		nowobj->CreateArrow();
 
 		int b_size = 0;
 		for (auto building : m_buildingList)
@@ -115,21 +120,21 @@ void SceneMgr::Update()
 			}
 			b_size++;
 		}
-		for (int i = 0;i < m_bulletList.size();++i) 
+		for (int i = 0;i < m_bulletList.size();++i)
 		{
-				Object* bullet = m_bulletList[i];
-				b_collider = bullet->GetCollider();
-				if (BoxCollision(o_collider, b_collider)) 
-				{
-					nowobj->Damage(10);
-					bullet->Damage(20);
-				}
-				if (bullet->IsDead()) 
-				{
-					m_bulletList.erase(m_bulletList.begin() + i);
-					continue;
-				}
-			}///////
+			Object* bullet = m_bulletList[i];
+			b_collider = bullet->GetCollider();
+			if (BoxCollision(o_collider, b_collider))
+			{
+				nowobj->Damage(10);
+				bullet->Damage(20);
+			}
+			if (bullet->IsDead())
+			{
+				m_bulletList.erase(m_bulletList.begin() + i);
+				continue;
+			}
+		}///////
 
 		if (nowobj->IsDead()) {
 			m_objectList.erase(m_objectList.begin() + j);
@@ -137,8 +142,51 @@ void SceneMgr::Update()
 		}
 		nowobj->Update(elapsedTime);
 	}
-	for (auto data : m_bulletList) 
+	for (auto data : m_bulletList)
 		data->Update(elapsedTime);
+
+	//í™”ì‚´ë°œì‚¬ë¶€ë¶„
+	for (auto a : m_objectList)
+	{
+		int a_size = 0;
+		for (auto arrow : a->m_arrowList) {
+			a_collider = arrow->GetCollider();
+			int b_size = 0;
+			for (auto building : m_buildingList) 
+			{
+				Transform* s_collider2 = building->GetCollider();
+				if (BoxCollision(s_collider2, a_collider))
+				{
+					building->Damage(20);
+					arrow->Damage(10);
+				}
+				if (building->IsDead())
+				{
+					m_buildingList.erase(m_buildingList.begin() + b_size);
+				}
+				b_size++;
+			}
+			int o_size = 0;
+			for (auto character : m_objectList) {
+				Transform* o_collider2 = character->GetCollider();
+				if (BoxCollision(o_collider2, a_collider) && arrow->m_parent != character)
+				{
+					character->Damage(20);
+					arrow->Damage(20);
+				}
+				if (character->IsDead()) {
+					m_objectList.erase(m_objectList.begin() + o_size);
+				}
+				o_size++;
+			}
+			if (arrow->IsDead()) {
+				a->m_arrowList.erase(a->m_arrowList.begin() + a_size);
+				continue;
+			}
+			arrow->Update(elapsedTime);
+			a_size++;
+		}
+	}
 	Render();
 }
 
@@ -152,7 +200,12 @@ void SceneMgr::Render()
 	{
 		data->Render();
 	}
-	for(auto data : m_buildingList)
-		data->Render();
+	for (auto data : m_buildingList) 
+	{
+		data->Render(m_texture);
+	}
+	for (auto data : m_objectList) 
+		for (auto arrow : data->m_arrowList)
+				arrow->Render();
 }
 
