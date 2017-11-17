@@ -2,7 +2,7 @@
 #include "Object.h"
 
 
-Object::Object(const Transform& pos, const Color& color, const float size, Renderer* renderer,int type,int life,Object* parent)
+Object::Object(const Transform& pos, const Color& color, const float size, Renderer* renderer,int type,int life,int team,Object* parent)
 {
 	//srand((unsigned)time(NULL));
 	m_transform = pos;
@@ -12,6 +12,7 @@ Object::Object(const Transform& pos, const Color& color, const float size, Rende
 	m_type = type;
 	m_life = life;
 	m_parent = parent;
+	m_team = team;
 
 	m_direction = { float(rand() % 3) + 1,float(rand() % 3) + 1,0 };
 	if (rand() % 2 == 1)
@@ -49,6 +50,10 @@ int Object::GetType()
 {
 	return m_type;
 }
+int Object::GetTeam()
+{
+	return m_team;
+}
 void Object::ShowLife()
 {
 	cout << m_life;
@@ -63,15 +68,33 @@ void Object::CreateArrow()
 	float elapsedTime_a = m_currTime_a - m_prevTime_a;
 	m_prevTime_a = m_currTime_a;
 	m_fireTime_a += elapsedTime_a;
-	if (m_fireTime_a>0.5)
+	if (m_fireTime_a>3.0)
 	{
 		m_fireTime_a = 0;
 		Transform parent = m_transform;
 		//Object* newObject = new Object(newPos, color, size, m_renderer, type, life);
-		Object* newObject = new Object(parent, { 0,1,0,1 }, 2 ,m_renderer, OBJECT_ARROW, 10, this);
+		Object* newObject = new Object(parent, { 0,1,0,1 }, 2 ,m_renderer, OBJECT_ARROW, 10,TEAM_1, this);
 		newObject->SetSpeed({ 100 ,100 ,0 });
 		m_arrowList.push_back(newObject);
 	}
+}
+void Object::CreateBullet()
+{
+	printf("a");
+	m_currTime_b = (float)timeGetTime()*0.001f;
+	float elapsedTime_b = m_currTime_b - m_prevTime_b;
+	m_prevTime_b = m_currTime_b;
+	m_fireTime_b += elapsedTime_b;
+	if (m_fireTime_b>10.0)
+	{
+		m_fireTime_b = 0;
+		Transform parent = m_transform;
+		//Object* newObject = new Object(newPos, color, size, m_renderer, type, life);
+		Object* newObject = new Object(parent, { 1,0,1,0 }, 2, m_renderer, OBJECT_BULLET,10,TEAM_1, this);
+		newObject->SetSpeed({ 600 ,600 ,0 });
+		m_bulletList.push_back(newObject);
+	}
+
 }
 
 Color Object::GetColor(Color & color)
@@ -109,19 +132,19 @@ void Object::Update(float elapsedTime)
 
 
 
-	if (m_transform.y >= 300)
+	if (m_transform.y >= 400)
 	{
 		m_direction.y = -1;
 	}
-	if (m_transform.x >= 400)
+	if (m_transform.x >= 250)
 	{
 		m_direction.x = -1;
 	}
-	if (m_transform.x <= -400)
+	if (m_transform.x <= -250)
 	{
 		m_direction.x = 1;
 	}
-	if (m_transform.y <= -300)
+	if (m_transform.y <= -400)
 	{
 		m_direction.y = 1;
 	}

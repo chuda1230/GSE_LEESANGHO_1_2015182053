@@ -20,12 +20,21 @@ SceneMgr::SceneMgr()
 
 	m_size = 100;	
 	m_prevTime = (float)timeGetTime()*0.001f;
-	Object* newObject = new Object({ 0,0,0 }, { 1,1,0,0 }, 50, m_renderer, OBJECT_BUILDING, 500);
-	printf("a");
-	//m_objectList.push_back(newObject);
+	Object* newObject = new Object({ 200,300,0 }, { 1,1,0,0 }, 50, m_renderer, OBJECT_BUILDING, 500,TEAM_1);
 	m_buildingList.push_back(newObject);
-
+	newObject = new Object({ 0,350,0 }, { 1,1,0,0 }, 50, m_renderer, OBJECT_BUILDING, 500, TEAM_1);
+	m_buildingList.push_back(newObject);
+	newObject = new Object({ -200,300,0 }, { 1,1,0,0 }, 50, m_renderer, OBJECT_BUILDING, 500, TEAM_1);
+	m_buildingList.push_back(newObject);
+	newObject = new Object({ -200,-300,0 }, { 1,1,0,0 }, 50, m_renderer, OBJECT_BUILDING, 500, TEAM_2);
+	m_buildingList.push_back(newObject);
+	newObject = new Object({ 0,-350,0 }, { 1,1,0,0 }, 50, m_renderer, OBJECT_BUILDING, 500, TEAM_2);
+	m_buildingList.push_back(newObject);
+	newObject = new Object({ 200,-300,0 }, { 1,1,0,0 }, 50, m_renderer, OBJECT_BUILDING, 500, TEAM_2);
+	m_buildingList.push_back(newObject);
+	//m_objectList.push_back(newObject);
 	m_texture = m_renderer->CreatePngTexture("./Resources/station.png");
+	m_texture2 = m_renderer->CreatePngTexture("./Resources/station2.png");
 }
 SceneMgr::~SceneMgr()
 {
@@ -52,13 +61,13 @@ SceneMgr::~SceneMgr()
 //	}
 //}
 
-void SceneMgr::AddObject(float x, float y, Color color, int size, int type, int life, Transform speed)
+void SceneMgr::AddObject(float x, float y, Color color, int size, int type, int life, int team, Transform speed)
 {
 	if (m_objectList.size() <= 100) {
 		x = x - 250;
-		y = 250 - y;
+		y = 400 - y;
 		Transform newPos = { x,y,0 };
-		Object* newObject = new Object(newPos, color, size, m_renderer, type, life);
+		Object* newObject = new Object(newPos, color, size, m_renderer, type, life,team);
 		newObject->SetSpeed(speed);
 		newObject->SetColor({ 1,1,1,1 });
 		m_objectList.push_back(newObject);
@@ -81,20 +90,37 @@ void SceneMgr::Update()
 	m_currTime = (float)timeGetTime()*0.001f;
 	float elapsedTime = m_currTime - m_prevTime;
 	m_prevTime = m_currTime;
-	m_fireTime += elapsedTime;
-	//srand(time(NULL));
-	if (m_fireTime > 0.5 && m_buildingList.size() > 0) {
-		printf("s");
-		m_fireTime = 0;
-		Object* newObject = new Object({ 0,0,0 }, { 1,1,1 }, 2, m_renderer, OBJECT_BULLET, 20);
-		newObject->SetSpeed({ 300,300,0 });
-		m_bulletList.push_back(newObject);
-	}
+	//m_fireTime += elapsedTime;
+	srand(time(NULL));
+	//if (m_fireTime > 0.5 && m_buildingList.size() > 0) {
+	//	m_fireTime = 0;
+	//	Object* newObject = new Object({ 0,0,0 }, { 1,1,1 }, 2, m_renderer, OBJECT_BULLET, 20,TEAM_1);
+	//	newObject->SetSpeed({ 600,600,0 });
+	//	m_bulletList.push_back(newObject);
+	//}
 
 	Transform* s_collider = nullptr;
 	Transform* o_collider = nullptr;
 	Transform* b_collider = nullptr;
 	Transform* a_collider = nullptr;
+	for (int i = 0;i < m_buildingList.size();++i)
+	{
+		Object* nowbui = m_buildingList[i];
+		s_collider = nowbui->GetCollider();
+		nowbui->CreateBullet();
+
+		int o_size = 0;
+		for (auto character : m_objectList)
+		{
+			o_collider = character->GetCollider();
+			if (BoxCollision(s_collider, o_collider))
+			{
+				character->Damage(10);
+				nowbui->Damage(5);
+			}
+		}
+	}
+	//여기까지 진행중
 
 	for (int j = 0;j < m_objectList.size();++j)
 	{
@@ -119,7 +145,7 @@ void SceneMgr::Update()
 				m_buildingList.erase(m_buildingList.begin() + b_size);
 			}
 			b_size++;
-		}
+		}	
 		for (int i = 0;i < m_bulletList.size();++i)
 		{
 			Object* bullet = m_bulletList[i];
@@ -196,13 +222,17 @@ void SceneMgr::Render()
 	{
 		data->Render();
 	}
-	for (auto data : m_bulletList)
-	{
-		data->Render();
+	for (auto data : m_buildingList) {
+		for (auto bullet : data->m_bulletList) {
+			bullet->Render();
+		}
 	}
 	for (auto data : m_buildingList) 
 	{
-		data->Render(m_texture);
+		if (data->GetTeam() == TEAM_1)
+			data->Render(m_texture);
+		else
+			data->Render(m_texture2);
 	}
 	for (auto data : m_objectList) 
 		for (auto arrow : data->m_arrowList)

@@ -54,7 +54,7 @@ void MouseInput(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
-		g_sceneMgr->AddObject(x, y, { 1,1,1,1 },10,OBJECT_CHARACTER,10, { 100 ,100 ,0 });
+		g_sceneMgr->AddObject(x, y, { 1,1,1,1 },10,OBJECT_CHARACTER,10,TEAM_1,{ 300 ,300 ,0 });
 	}
 	RenderScene();
 }
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(0, 0);
-	glutInitWindowSize(500, 500);
+	glutInitWindowSize(500, 800);
 	glutCreateWindow("Game Software Engineering KPU");
 
 	glewInit();

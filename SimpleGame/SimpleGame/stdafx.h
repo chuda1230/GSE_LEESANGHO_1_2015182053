@@ -10,8 +10,8 @@
 #include<random>
 #include<ctime>
 #include<Windows.h>
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 500
+#define WINDOW_HEIGHT 800
 
 using namespace std;
 
