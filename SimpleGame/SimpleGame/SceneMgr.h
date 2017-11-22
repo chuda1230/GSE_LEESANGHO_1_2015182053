@@ -11,14 +11,15 @@ public:
 	SceneMgr();
 	~SceneMgr();
 	//void AddObject();
-	void AddObject(float x,float y,Color color,int size,int type,int life, int team,Transform speed = { 0.0f,0.0f,0.0f });
+	void AddObject(float x,float y);
+	void AI();
 	Object* GetObject(int index);
 	void GetList(vector<Object*>& param);
 	void Update();
 	void Render();
+	void Delete();
 private:
-	GLuint m_texture;
-	GLuint m_texture2;
+	GLuint m_texture[2];
 
 	vector<Object*> m_objectList;
 	vector<Object*> m_bulletList;
@@ -30,4 +31,6 @@ private:
 	float m_prevTime = 0;
 	float m_currTime = 0;
 	float m_fireTime = 0;
+	float m_spawnTime = 0;
+	float m_coolTime = 2.0f;
 };

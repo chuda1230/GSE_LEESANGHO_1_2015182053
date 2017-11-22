@@ -54,7 +54,9 @@ void MouseInput(int button, int state, int x, int y)
 {
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
-		g_sceneMgr->AddObject(x, y, { 1,1,1,1 },10,OBJECT_CHARACTER,10,TEAM_1,{ 300 ,300 ,0 });
+		x = x - 250;
+		y = 400 - y;
+		g_sceneMgr->AddObject(x, y);
 	}
 	RenderScene();
 }

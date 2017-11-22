@@ -2,24 +2,46 @@
 #include "Object.h"
 
 
-Object::Object(const Transform& pos, const Color& color, const float size, Renderer* renderer,int type,int life,int team,Object* parent)
+Object::Object(const Transform& pos, const Color& color, Renderer* renderer, int type, int team, Object* parent)
 {
-	//srand((unsigned)time(NULL));
+
+	switch (type) {
+	case OBJECT_CHARACTER:
+		m_size = 10;
+		m_life = 10;
+		m_speed = { 300,300,0 };
+		break;
+	case OBJECT_BUILDING:
+		m_size = 100;
+		m_life = 500;
+		break;
+	case OBJECT_BULLET:
+		m_size = 2;
+		m_life = 20;
+		m_speed = { 600,600,0 };
+		break;
+	case OBJECT_ARROW:
+		m_size = 2;
+		m_life = 10;
+		m_speed = { 100,100,0 };
+		break;
+	}
 	m_transform = pos;
 	m_color = color;
-	m_size = size;
 	m_renderer = renderer;
 	m_type = type;
-	m_life = life;
 	m_parent = parent;
 	m_team = team;
+	m_arrowList.reserve(100);
 
-	m_direction = { float(rand() % 3) + 1,float(rand() % 3) + 1,0 };
-	if (rand() % 2 == 1)
+	float tempx = rand() / float(RAND_MAX);
+	float tempy = 1 - tempx;
+	m_direction = {tempx,tempy,0};
+	if (rand() % 2 < 1)
 	{
 		m_direction.x *= -1;
 	}
-	if (rand() % 2 == 1)
+	if (rand() % 2 < 1)
 	{
 		m_direction.y *= -1;
 	}
@@ -61,48 +83,44 @@ void Object::ShowLife()
 void Object::Damage(const float damage)
 {
 	m_life -= damage;
+	if (m_life <= 0)
+	{
+		m_life = 0;
+		isDead = true;
+	}
 }
-void Object::CreateArrow()
+float Object::GetLife()
 {
-	m_currTime_a = (float)timeGetTime()*0.001f;
-	float elapsedTime_a = m_currTime_a - m_prevTime_a;
-	m_prevTime_a = m_currTime_a;
+	return m_life;
+}
+void Object::CreateArrow(float elapsedTime_a)
+{
 	m_fireTime_a += elapsedTime_a;
-	if (m_fireTime_a>3.0)
+	if (m_fireTime_a>=1.0)
 	{
 		m_fireTime_a = 0;
 		Transform parent = m_transform;
 		//Object* newObject = new Object(newPos, color, size, m_renderer, type, life);
-		Object* newObject = new Object(parent, { 0,1,0,1 }, 2 ,m_renderer, OBJECT_ARROW, 10,TEAM_1, this);
-		newObject->SetSpeed({ 100 ,100 ,0 });
+		Color* teamColor;
+		if (m_team == TEAM_1)
+		{
+			teamColor = team1_color;
+		}
+		else {
+			teamColor = team2_color;
+		}
+		Object* newObject;
+		if (m_type == OBJECT_BUILDING)
+		{
+			newObject = new Object(parent, teamColor[0],  m_renderer, OBJECT_BULLET,  m_team, this);
+		}
+		else
+		{
+			newObject = new Object(parent, teamColor[1], m_renderer, OBJECT_ARROW, m_team, this);
+		}
 		m_arrowList.push_back(newObject);
 	}
 }
-void Object::CreateBullet()
-{
-	printf("a");
-	m_currTime_b = (float)timeGetTime()*0.001f;
-	float elapsedTime_b = m_currTime_b - m_prevTime_b;
-	m_prevTime_b = m_currTime_b;
-	m_fireTime_b += elapsedTime_b;
-	if (m_fireTime_b>10.0)
-	{
-		m_fireTime_b = 0;
-		Transform parent = m_transform;
-		//Object* newObject = new Object(newPos, color, size, m_renderer, type, life);
-		Object* newObject = new Object(parent, { 1,0,1,0 }, 2, m_renderer, OBJECT_BULLET,10,TEAM_1, this);
-		newObject->SetSpeed({ 600 ,600 ,0 });
-		m_bulletList.push_back(newObject);
-	}
-
-}
-
-Color Object::GetColor(Color & color)
-{
-	//color = m_color;
-	return color;
-}
-
 Transform* Object::GetCollider()
 {
 	m_collider[0].x = m_transform.x - (m_size / 2);
@@ -113,16 +131,25 @@ Transform* Object::GetCollider()
 	m_collider[1].z = 0;
 	return m_collider;
 }
+
+Color Object::GetColor(Color & color)
+{
+	//color = m_color;
+	return color;
+}
 void Object::Render()
 {
 	m_renderer->DrawSolidRect(m_transform.x, m_transform.y, m_transform.z, m_size, m_color.r, m_color.g, m_color.b, 1);
 
+	for (auto arrow : m_arrowList)
+		arrow->Render();
 }
 
 void Object::Render(GLuint texture)
 {
 	m_renderer->DrawTexturedRect(m_transform.x, m_transform.y, m_transform.z, m_size, m_color.r, m_color.g, m_color.b, 1,texture);
-
+	for (auto arrow : m_arrowList)
+		arrow->Render();
 }
 void Object::Update(float elapsedTime)
 {
@@ -132,21 +159,25 @@ void Object::Update(float elapsedTime)
 
 
 
-	if (m_transform.y >= 400)
+	if (m_transform.y >= (WINDOW_HEIGHT / 2-10))
 	{
-		m_direction.y = -1;
+		m_transform.y = (WINDOW_HEIGHT / 2 - 10);
+		m_direction.y *= -1;
 	}
-	if (m_transform.x >= 250)
+	if (m_transform.x >= (WINDOW_WIDTH/2-10))
 	{
-		m_direction.x = -1;
+		m_transform.x = (WINDOW_WIDTH / 2 - 10);
+		m_direction.x *= -1;
 	}
-	if (m_transform.x <= -250)
+	if (m_transform.x <= -(WINDOW_WIDTH / 2 - 10))
 	{
-		m_direction.x = 1;
+		m_transform.x = -(WINDOW_WIDTH / 2 - 10);
+		m_direction.x *= -1;
 	}
-	if (m_transform.y <= -400)
+	if (m_transform.y <= -(WINDOW_HEIGHT/2-10))
 	{
-		m_direction.y = 1;
+		m_transform.y = -(WINDOW_HEIGHT / 2 - 10);
+		m_direction.y *= -1;
 	}
 }
 
