@@ -161,7 +161,6 @@
     <ClInclude Include="SceneMgr.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Unit.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LoadPng.cpp" />
@@ -175,15 +174,18 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Unit.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\SolidRect.fs" />
     <None Include="Shaders\SolidRect.vs" />
+    <None Include="Shaders\SolidRectGauge.fs" />
+    <None Include="Shaders\SolidRectGauge.vs" />
     <None Include="Shaders\SolidRectWithTexture.fs" />
     <None Include="Shaders\SolidRectWithTexture.vs" />
     <None Include="Shaders\SolidRectWithTextureSeq.fs" />
     <None Include="Shaders\SolidRectWithTextureSeq.vs" />
+    <None Include="Shaders\SolidRectXY.fs" />
+    <None Include="Shaders\SolidRectXY.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

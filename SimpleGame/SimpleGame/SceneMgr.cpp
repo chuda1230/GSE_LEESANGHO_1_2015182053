@@ -21,17 +21,17 @@ SceneMgr::SceneMgr()
 	m_objectList.reserve(100);
 	m_size = 100;
 	m_prevTime = (float)timeGetTime()*0.001f;
-	Object* newObject = new Object({ 200,300,0 }, { 1,1,0,0 }, m_renderer, OBJECT_BUILDING,TEAM_1);
+	Object* newObject = new Object({ 200,300,0 }, { 1,1,1,1 }, m_renderer, OBJECT_BUILDING,TEAM_1);
 	m_objectList.push_back(newObject);
-	newObject = new Object({ 0,350,0 }, { 1,1,0,0 }, m_renderer, OBJECT_BUILDING,  TEAM_1);
+	newObject = new Object({ 0,350,0 }, { 1,1,1,1 }, m_renderer, OBJECT_BUILDING,  TEAM_1);
 	m_objectList.push_back(newObject);
-	newObject = new Object({ -200,300,0 }, { 1,1,0,0 }, m_renderer, OBJECT_BUILDING,  TEAM_1);
+	newObject = new Object({ -200,300,0 }, { 1,1,1,1 }, m_renderer, OBJECT_BUILDING,  TEAM_1);
 	m_objectList.push_back(newObject);
-	newObject = new Object({ -200,-300,0 }, { 1,1,0,0 }, m_renderer, OBJECT_BUILDING,  TEAM_2);
+	newObject = new Object({ -200,-300,0 }, { 1,1,1,1 }, m_renderer, OBJECT_BUILDING,  TEAM_2);
 	m_objectList.push_back(newObject);
-	newObject = new Object({ 0,-350,0 }, { 1,1,0,0 },  m_renderer, OBJECT_BUILDING, TEAM_2);
+	newObject = new Object({ 0,-350,0 }, { 1,1,1,1 },  m_renderer, OBJECT_BUILDING, TEAM_2);
 	m_objectList.push_back(newObject);
-	newObject = new Object({ 200,-300,0 }, { 1,1,0,0 },  m_renderer, OBJECT_BUILDING, TEAM_2);
+	newObject = new Object({ 200,-300,0 }, { 1,1,1,1 },  m_renderer, OBJECT_BUILDING, TEAM_2);
 	m_objectList.push_back(newObject);
 	//m_objectList.push_back(newObject);
 	m_texture[0] = m_renderer->CreatePngTexture("./Resources/station.png");
@@ -125,8 +125,6 @@ void SceneMgr::Update()
 		if (standard->GetType() == OBJECT_BUILDING)
 		{
 			for (auto compare : m_objectList) {
-				if (compare->GetType() == OBJECT_BUILDING)
-					continue;
 				com_collider = compare->GetCollider();
 				if (BoxCollision(sta_collider, com_collider) && standard->GetTeam() != compare->GetTeam())
 				{

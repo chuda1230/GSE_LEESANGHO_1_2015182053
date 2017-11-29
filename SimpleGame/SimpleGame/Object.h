@@ -9,7 +9,7 @@
 class Object
 {
 public:
-	Object(const Transform& pos, const Color& color, Renderer* renderer,int type,int team,Object* parent=nullptr);
+	Object(const Transform& pos, const Color& color, Renderer* renderer, int type, int team, Object* parent = nullptr);
 	~Object();
 	vector<Object*> m_arrowList;
 	vector<Object*> m_bulletList;
@@ -44,10 +44,13 @@ private:
 
 	Transform m_collider[2];
 
+	float m_gauge;
+	int m_orign_life = 0;
 	int m_life;
 	int m_type;
 	int m_team;
 	float m_damage = 0;
+	float m_level = 0;
 	bool m_dead = false;
 	float m_prevTime_a = 0;
 	float m_currTime_a = 0;
