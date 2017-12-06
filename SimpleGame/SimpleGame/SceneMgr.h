@@ -19,11 +19,13 @@ public:
 	void Render();
 	void Delete();
 private:
-	GLuint m_texture[2];
+	GLuint m_texture[4];
 
 	vector<Object*> m_objectList;
 	vector<Object*> m_bulletList;
 	vector<Object*> m_buildingList;
+	vector<Object*> m_backgroundList;
+
 	
 	Renderer* m_renderer;
 	int m_size;

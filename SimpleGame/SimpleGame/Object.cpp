@@ -8,8 +8,12 @@ Object::Object(const Transform& pos, const Color& color, Renderer* renderer, int
 {
 
 	switch (type) {
+	case BACKGROUND:
+		m_size = 800;
+		m_level = 0.6;
+		break;
 	case OBJECT_CHARACTER:
-		m_size = 10;
+		m_size = 50;
 		m_orign_life = 100;
 		m_life = 100;
 		m_speed = { 300,300,0 };
@@ -43,6 +47,7 @@ Object::Object(const Transform& pos, const Color& color, Renderer* renderer, int
 	m_parent = parent;
 	m_team = team;
 	m_arrowList.reserve(100);
+	m_particle = m_renderer->CreatePngTexture("./Resources/particle.png");
 
 	float tempx = rand() / float(RAND_MAX);
 	float tempy = 1 - tempx;
@@ -150,29 +155,33 @@ Color Object::GetColor(Color & color)
 }
 void Object::Render()
 {
-	if (GetType() == OBJECT_CHARACTER) {
-		m_renderer->DrawSolidRect(m_transform.x, m_transform.y, m_transform.z, m_size, m_color.r, m_color.g, m_color.b, 1, m_level);
-		m_renderer->DrawSolidRectGauge(m_transform.x, m_transform.y+20, m_transform.z, GAUGE_WIDTH, GAUHE_HEIGHT, m_color.r, m_color.g, m_color.b, 1, (float)m_life / (float)m_orign_life, m_level);
-	}
-	else {
-		m_renderer->DrawSolidRect(m_transform.x, m_transform.y, m_transform.z, m_size, m_color.r, m_color.g, m_color.b, 1, m_level);
-	}
+	m_renderer->DrawSolidRect(m_transform.x, m_transform.y, m_transform.z, m_size, m_color.r, m_color.g, m_color.b, 1, m_level);
+	if (m_type == OBJECT_BULLET)
+		m_renderer->DrawParticle(m_transform.x, m_transform.y, m_transform.z, 7, 1, 1, 1, 1, -m_direction.x, -m_direction.y, m_particle, m_particleIndex);
 	for (auto arrow : m_arrowList)
 		arrow->Render();
 }
 
 void Object::Render(GLuint texture)
 {
-	m_renderer->DrawTexturedRect(m_transform.x, m_transform.y, m_transform.z, m_size, m_color.r, m_color.g, m_color.b, 1,texture,m_level);
+	if (GetType() != OBJECT_CHARACTER)
+		m_renderer->DrawTexturedRect(m_transform.x, m_transform.y, m_transform.z, m_size, m_color.r, m_color.g, m_color.b, 1, texture, m_level);
+	else {
+		m_renderer->DrawTexturedRectSeq(m_transform.x, m_transform.y, m_transform.z, m_size, m_color.r, m_color.g, m_color.b, 1, texture, int(m_animationIndex) % 3, 0, 3, 8, m_level);
+		m_renderer->DrawSolidRectGauge(m_transform.x, m_transform.y + 30, m_transform.z, GAUGE_WIDTH, GAUHE_HEIGHT, m_color.r, m_color.g, m_color.b, 1, (float)m_life / (float)m_orign_life, m_level);
+	}
 	if(GetTeam()==TEAM_1)
 		m_renderer->DrawSolidRectGauge(m_transform.x, m_transform.y, m_transform.z, GAUGE_WIDTH, GAUHE_HEIGHT, 1, 0, 0, 1, (float)m_life / (float)m_orign_life, m_level);
-	else
+	else if(GetTeam() == TEAM_2)
 		m_renderer->DrawSolidRectGauge(m_transform.x, m_transform.y, m_transform.z, GAUGE_WIDTH, GAUHE_HEIGHT, 0, 0, 1, 1, (float)m_life / (float)m_orign_life, m_level);
+
 	for (auto arrow : m_arrowList)
 		arrow->Render();
 }
 void Object::Update(float elapsedTime)
 {
+	m_animationIndex += elapsedTime * 3;
+	m_particleIndex += elapsedTime;
 	m_transform.y += m_direction.y*m_speed.x*elapsedTime;
 	m_transform.x += m_direction.x*m_speed.y*elapsedTime;
 	m_transform.z += m_direction.z*m_speed.z*elapsedTime;

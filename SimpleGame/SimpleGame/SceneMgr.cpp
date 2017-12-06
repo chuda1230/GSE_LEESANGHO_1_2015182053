@@ -21,7 +21,9 @@ SceneMgr::SceneMgr()
 	m_objectList.reserve(100);
 	m_size = 100;
 	m_prevTime = (float)timeGetTime()*0.001f;
-	Object* newObject = new Object({ 200,300,0 }, { 1,1,1,1 }, m_renderer, OBJECT_BUILDING,TEAM_1);
+	Object* newObject = new Object({ 0,0,0 }, { 1,1,1,1 }, m_renderer, BACKGROUND, TEAM_0);
+	m_backgroundList.push_back(newObject);
+	newObject = new Object({ 200,300,0 }, { 1,1,1,1 }, m_renderer, OBJECT_BUILDING,TEAM_1);
 	m_objectList.push_back(newObject);
 	newObject = new Object({ 0,350,0 }, { 1,1,1,1 }, m_renderer, OBJECT_BUILDING,  TEAM_1);
 	m_objectList.push_back(newObject);
@@ -33,9 +35,10 @@ SceneMgr::SceneMgr()
 	m_objectList.push_back(newObject);
 	newObject = new Object({ 200,-300,0 }, { 1,1,1,1 },  m_renderer, OBJECT_BUILDING, TEAM_2);
 	m_objectList.push_back(newObject);
-	//m_objectList.push_back(newObject);
 	m_texture[0] = m_renderer->CreatePngTexture("./Resources/station.png");
 	m_texture[1] = m_renderer->CreatePngTexture("./Resources/station2.png");
+	m_texture[2] = m_renderer->CreatePngTexture("./Resources/background.png");
+	m_texture[3] = m_renderer->CreatePngTexture("./Resources/spaceship.png");
 }
 SceneMgr::~SceneMgr()
 {
@@ -64,7 +67,7 @@ SceneMgr::~SceneMgr()
 
 void SceneMgr::AddObject(float x, float y)
 {
-	if (m_coolTime>2.0f && y<=0) {
+	if (m_coolTime>0.8f && y<=0) {
 
 		m_coolTime = 0;
 		Transform newPos = { x,y,0 };
@@ -74,7 +77,7 @@ void SceneMgr::AddObject(float x, float y)
 }
 void SceneMgr::AI()
 {
-	if (m_spawnTime > 1.0f)
+	if (m_spawnTime > 1.5f)
 	{
 		Transform newPos = { (rand()%WINDOW_WIDTH) - 250,rand() % (WINDOW_HEIGHT / 2),0 };
 		Object* newObject = new Object(newPos, { 1,0,0,1 }, m_renderer, OBJECT_CHARACTER, TEAM_1);
@@ -167,12 +170,19 @@ void SceneMgr::Update()
 
 void SceneMgr::Render()
 {
+	
+	for (auto data : m_backgroundList)
+	{
+		data->Render(m_texture[2]);
+	}
 	for (auto data : m_objectList)
 	{
 		if (data->GetTeam() == TEAM_1 && data->GetType() == OBJECT_BUILDING)
 			data->Render(m_texture[1]);
 		else if (data->GetTeam() == TEAM_2 && data->GetType() == OBJECT_BUILDING)
 			data->Render(m_texture[0]);
+		else if (data->GetType() == OBJECT_CHARACTER)
+			data->Render(m_texture[3]);
 		else
 			data->Render();
 	}

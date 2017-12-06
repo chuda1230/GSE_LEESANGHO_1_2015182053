@@ -1,5 +1,7 @@
 #pragma once
 //#include "Renderer.h"
+#define BACKGROUND 100
+#define TEAM_0 30
 #define TEAM_1 10
 #define TEAM_2 20
 #define OBJECT_BUILDING 0
@@ -43,6 +45,12 @@ private:
 	float m_size;
 
 	Transform m_collider[2];
+
+	float m_animationIndex = 0;
+	float m_particleIndex = 0;
+	GLuint m_particle;
+
+
 
 	float m_gauge;
 	int m_orign_life = 0;
