@@ -1,5 +1,8 @@
-﻿#include "stdafx.h"
+﻿
+#include "stdafx.h"
 #include "SceneMgr.h"
+#include <Windows.h>
+
 bool BoxCollision(Transform* standard, Transform* target)
 {
 	bool ix = ((standard[0].x <= target[0].x && standard[1].x >= target[0].x) || (standard[0].x <= target[1].x && standard[1].x >= target[1].x));
@@ -17,10 +20,14 @@ SceneMgr::SceneMgr()
 	{
 		std::cout << "Renderer could not be initialized.. \n";
 	}
+	m_sound = new Sound();
+	soundBG = m_sound->CreateSound("./Dependencies/SoundSamples/MF-W-90.XM");
+	m_sound->PlaySound(soundBG, true, 0.2f);
+
 
 	m_objectList.reserve(100);
 	m_size = 100;
-	m_prevTime = (float)timeGetTime()*0.001f;
+	m_prevTime = (float)GetTickCount()*0.001f;
 	Object* newObject = new Object({ 0,0,0 }, { 1,1,1,1 }, m_renderer, BACKGROUND, TEAM_0);
 	m_backgroundList.push_back(newObject);
 	newObject = new Object({ 200,300,0 }, { 1,1,1,1 }, m_renderer, OBJECT_BUILDING,TEAM_1);
@@ -98,7 +105,7 @@ void SceneMgr::GetList(vector<Object*>& param)
 
 void SceneMgr::Update()
 {
-	m_currTime = (float)timeGetTime()*0.001f;
+	m_currTime = (float)GetTickCount()*0.001f;
 	float elapsedTime = m_currTime - m_prevTime;
 	m_prevTime = m_currTime;
 	m_spawnTime += elapsedTime;
@@ -129,7 +136,7 @@ void SceneMgr::Update()
 		{
 			for (auto compare : m_objectList) {
 				com_collider = compare->GetCollider();
-				if (BoxCollision(sta_collider, com_collider) && standard->GetTeam() != compare->GetTeam())
+				if (BoxCollision(sta_collider, com_collider) && standard->GetTeam() != compare->GetTeam() && (!(compare->isDead) && !(standard->isDead)))
 				{
 					standard->Damage(compare->GetLife());
 					compare->Damage(standard->GetLife());
@@ -138,10 +145,10 @@ void SceneMgr::Update()
 				for(auto bullet : standard->m_arrowList)
 				{
 					bul_collider = bullet->GetCollider();
-					if (BoxCollision(com_collider, bul_collider) && compare->GetTeam() != bullet->GetTeam())
+					if (BoxCollision(com_collider, bul_collider) && compare->GetTeam() != bullet->GetTeam() && (!(compare->isDead) && !(bullet->isDead)))
 					{
 						bullet->Damage(compare->GetLife());
-						compare->Damage(bullet->GetLife());
+						compare->Damage(35);
 					}
 				}
 			}

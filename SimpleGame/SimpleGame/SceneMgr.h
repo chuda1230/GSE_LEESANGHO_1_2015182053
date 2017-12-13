@@ -3,6 +3,7 @@
 #define OBJECT_CHARACTER 1
 #define OBJECT_BULLET 2
 #include"Object.h"
+#include"Sound.h"
 
 
 class SceneMgr
@@ -29,6 +30,11 @@ private:
 	
 	Renderer* m_renderer;
 	int m_size;
+
+	Sound* m_sound;
+	int soundBG;
+
+
 
 	float m_prevTime = 0;
 	float m_currTime = 0;
