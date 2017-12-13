@@ -10,6 +10,8 @@
 #include<random>
 #include<ctime>
 #include<Windows.h>
+#include"Renderer.h"
+#include"Sound.h"
 #define WINDOW_WIDTH 500
 #define WINDOW_HEIGHT 800
 

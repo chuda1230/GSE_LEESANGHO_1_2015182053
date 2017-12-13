@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Object.h"
+#include<stdlib.h>
+#define _CRT_SECURE_NO_WARNINGS
 #define GAUGE_WIDTH 20
 #define GAUHE_HEIGHT 5
 
@@ -164,8 +166,12 @@ void Object::Render()
 
 void Object::Render(GLuint texture)
 {
-	if (GetType() != OBJECT_CHARACTER)
+	if (GetType() != OBJECT_CHARACTER) {
+		char s1[10];
+		_itoa_s(m_orign_life - m_life, s1, 10);
+		m_renderer->DrawText(m_transform.x, m_transform.y + m_size / 1.5, GLUT_BITMAP_TIMES_ROMAN_10, 1, 1, 1, s1);
 		m_renderer->DrawTexturedRect(m_transform.x, m_transform.y, m_transform.z, m_size, m_color.r, m_color.g, m_color.b, 1, texture, m_level);
+	}
 	else {
 		m_renderer->DrawTexturedRectSeq(m_transform.x, m_transform.y, m_transform.z, m_size, m_color.r, m_color.g, m_color.b, 1, texture, int(m_animationIndex) % 3, 0, 3, 8, m_level);
 		m_renderer->DrawSolidRectGauge(m_transform.x, m_transform.y + 30, m_transform.z, GAUGE_WIDTH, GAUHE_HEIGHT, m_color.r, m_color.g, m_color.b, 1, (float)m_life / (float)m_orign_life, m_level);
