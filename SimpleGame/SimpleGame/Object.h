@@ -48,7 +48,9 @@ private:
 
 	float m_animationIndex = 0;
 	float m_particleIndex = 0;
+	float m_climateIndex = 0;
 	GLuint m_particle;
+	GLuint m_climate;
 
 
 
